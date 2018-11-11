@@ -1,5 +1,5 @@
 import random, parseopt, strutils
-import src/[datasets, plot, network]
+import ../src/planar
 
 var
   show = true # false
