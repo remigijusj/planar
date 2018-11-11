@@ -1,22 +1,35 @@
 import arraymancer, strformat, random
-import ./types, ./net
+
+type F = float32 # internal datatype for efficiency
+
+const layers = [2, 3, 3, 1] # layer sizes
 
 let ctx = newContext(Tensor[F]) # autograd/neural network graph
+
+network ctx, PlanarNet:
+  layers:
+    hidden1: Linear(layers[0], layers[1])
+    hidden2: Linear(layers[1], layers[2])
+    outputs: Linear(layers[2], layers[3])
+  initialize:
+    Xavier(uniform, tanh)
+  forward x:
+    x.hidden1.tanh.hidden2.tanh.outputs
 
 
 proc optimizer(model: PlanarNet, learning_rate: F): auto =
   return optimizerSGD(model, learning_rate)
-  
-  
+
+
 proc predict*(model: PlanarNet, x_test: Tensor[float]): Tensor[float] =
   ctx.no_grad_mode:
     let x_pred = ctx.variable(x_test.astype(F))
     let y_pred = model.forward(x_pred).value.sigmoid
     return y_pred.astype(float)
-  
+
 
 # this should be in datasets?
-# synchroneously shuffle planar data examples
+# synchronously shuffle planar data examples
 proc shuffleExamples[T](x, y: Tensor[T]) =
   var xd = x.toRawSeq()
   var yd = y.toRawSeq()
@@ -33,7 +46,7 @@ proc trainModel*(x_train, y_train: Tensor[float],
                   learning_rate = 1.0,
                   epochs_cnt = 100,
                   batch_size = 32,
-                  debug_every = 1
+                  debug_every = 10
                 ): PlanarNet =
   let x = ctx.variable(x_train.astype(F))
   let y = y_train.astype(F)

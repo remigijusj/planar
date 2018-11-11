@@ -1,5 +1,5 @@
 import random, parseopt, strutils
-import src/[datasets, plot, training]
+import src/[datasets, plot, network]
 
 var
   show = false
