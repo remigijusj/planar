@@ -2,7 +2,7 @@ import arraymancer, strformat, random
 
 type F = float32 # internal datatype for efficiency
 
-const layers = [2, 3, 3, 1] # layer sizes
+const layers = [2, 5, 5, 1] # layer sizes
 
 let ctx = newContext(Tensor[F]) # autograd/neural network graph
 
@@ -15,10 +15,6 @@ network ctx, PlanarNet:
     Xavier(uniform, tanh)
   forward x:
     x.hidden1.tanh.hidden2.tanh.outputs
-
-
-proc optimizer(model: PlanarNet, learning_rate: F): auto =
-  return optimizerSGD(model, learning_rate)
 
 
 proc predict*(model: PlanarNet, x_test: Tensor[float]): Tensor[float] =
@@ -43,17 +39,17 @@ proc shuffleExamples[T](x, y: Tensor[T]) =
 
 # in the process examples get shuffled, see above
 proc trainModel*(x_train, y_train: Tensor[float],
-                  learning_rate = 1.0,
-                  epochs_cnt = 100,
-                  batch_size = 32,
-                  debug_every = 10
-                ): PlanarNet =
+                  learning_rate, beta1, beta2: float,
+                  epochs_cnt, batch_size, debug_every: int
+                ): tuple[model: PlanarNet, progress: seq[float]] =
   let x = ctx.variable(x_train.astype(F))
   let y = y_train.astype(F)
   let examples = y.shape[0]
 
   let model = ctx.init(PlanarNet)
-  let optim = model.optimizer(learning_rate.F)
+  # let optim = model.optimizerAdam(learning_rate.F, beta1.F, beta2.F)
+  let optim = model.optimizerSGD(learning_rate.F)
+  var progress = newSeq[float]()
 
   # mini-batch gradient descent
   for epoch in 0..<epochs_cnt:
@@ -71,10 +67,12 @@ proc trainModel*(x_train, y_train: Tensor[float],
       loss.backprop()
       optim.update()
 
-      if debug_every > 0 and (epoch mod debug_every == 0) and batch_id == max_batch:
+      if batch_id == max_batch:
         ctx.no_grad_mode:
           let y_pred = output.value.sigmoid.round
           let score = accuracy_score(target, y_pred)
-          echo &"Epoch {epoch:2d} => loss {loss.value[0]:.3f} Score {score:.3f}%"
+          progress.add(score)
+          if debug_every > 0 and (epoch mod debug_every == 0):
+            echo &"Epoch {epoch:2d} => loss {loss.value[0]:.3f} Score {score:.3f}%"
 
-  return model
+  return (model, progress)
