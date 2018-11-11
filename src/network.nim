@@ -1,10 +1,12 @@
 import arraymancer, strformat, random
+import ./options
 
 type F = float32 # internal datatype for efficiency
 
-const layers = [2, 5, 5, 1] # layer sizes
+# TODO: move hidden sizes to hyperparams
+const layers = [2, 5, 5, 1]
 
-let ctx = newContext(Tensor[F]) # autograd/neural network graph
+let ctx = newContext(Tensor[F])
 
 network ctx, PlanarNet:
   layers:
@@ -39,25 +41,25 @@ proc shuffleExamples[T](x, y: Tensor[T]) =
 
 # in the process examples get shuffled, see above
 proc trainModel*(x_train, y_train: Tensor[float],
-                  learning_rate, beta1, beta2: float,
-                  epochs_cnt, batch_size, debug_every: int
+                 hyper: Hyperparams,
+                 epochs_cnt, debug_every: int
                 ): tuple[model: PlanarNet, progress: seq[float]] =
   let x = ctx.variable(x_train.astype(F))
   let y = y_train.astype(F)
   let examples = y.shape[0]
 
   let model = ctx.init(PlanarNet)
-  # let optim = model.optimizerAdam(learning_rate.F, beta1.F, beta2.F)
-  let optim = model.optimizerSGD(learning_rate.F)
+  # let optim = model.optimizerAdam(hyper.learning_rate.F, hyper.beta1.F, hyper.beta2.F)
+  let optim = model.optimizerSGD(hyper.learning_rate.F)
   var progress = newSeq[float]()
 
   # mini-batch gradient descent
   for epoch in 0..<epochs_cnt:
     shuffleExamples(x.value, y)
-    let max_batch = ceil(examples/batch_size).int - 1
+    let max_batch = ceil(examples/hyper.batch_size).int - 1
     for batch_id in 0..max_batch:
-      let offset = batch_id * batch_size
-      let limit = min(offset + batch_size, examples)
+      let offset = batch_id * hyper.batch_size
+      let limit = min(offset + hyper.batch_size, examples)
       let batch  = x[offset ..< limit, _]
       let target = y[offset ..< limit, _]
 

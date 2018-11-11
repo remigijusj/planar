@@ -6,7 +6,7 @@ randomize()
 
 let (x, y) = makePetals(examples)
 
-let (model, scores) = trainModel(x, y, learning_rate, beta1, beta2, epochs, batch_size, debug_every)
+let (model, scores) = trainModel(x, y, hyper, epochs, debug_every)
 
 let grid = planarGrid(x, grid_size)
 let pred = model.predict(grid)
