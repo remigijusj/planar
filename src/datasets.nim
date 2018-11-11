@@ -82,3 +82,4 @@ proc planarGrid*(xs: Tensor[float], side: int): auto =
       let m = x * side + y
       result[m, 0] = (2 * x.float / side.float - 1.0) * lim
       result[m, 1] = (2 * y.float / side.float - 1.0) * lim
+

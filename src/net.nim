@@ -1,49 +1,51 @@
 import arraymancer
+import ./types, ./initial
 
-type F* = float32 # internal datatype for efficiency
-
-let layers = (2, 6, 3, 1) # layer sizes
+let layers = [2, 6, 3, 1] # layer sizes
 
 # >>> expanded from DSL <<<
 # network ctx, PlanarNet:
 #   layers:
 #     hidden1: Linear(layers[0], layers[1])
 #     hidden2: Linear(layers[1], layers[2])
-#     output:  Linear(layers[2], layers[3])
+#     outputs: Linear(layers[2], layers[3])
 #   forward x:
-#     x.hidden1.tanh.hidden2.tanh.output
+#     x.hidden1.tanh.hidden2.tanh.outputs
 
 
 type
   PlanarNet* = object
-    hidden1*: LinearLayer[Tensor[F]]
-    hidden2*: LinearLayer[Tensor[F]]
-    output*: LinearLayer[Tensor[F]]
+    nodes1*: LinearLayer[Tensor[F]]
+    nodes2*: LinearLayer[Tensor[F]]
+    nodes3*: LinearLayer[Tensor[F]]
 
 
+# He initialization
 proc init*(ctx: Context[Tensor[F]], model_type: typedesc[PlanarNet]): PlanarNet =
-  let w1 = randomTensor([layers[1], layers[0]], max = F(1.0)) .- F(0.5)
-  let b1 = randomTensor([1,         layers[1]], max = F(1.0)) .- F(0.5)
-  let w2 = randomTensor([layers[2], layers[1]], max = F(1.0)) .- F(0.5)
-  let b2 = randomTensor([1,         layers[2]], max = F(1.0)) .- F(0.5)
-  let w3 = randomTensor([layers[3], layers[2]], max = F(1.0)) .- F(0.5)
-  let b3 = randomTensor([1,         layers[3]], max = F(1.0)) .- F(0.5)
-  result.hidden1.weight = ctx.variable(w1, requires_grad = true)
-  result.hidden1.bias   = ctx.variable(b1, requires_grad = true)
-  result.hidden2.weight = ctx.variable(w2, requires_grad = true)
-  result.hidden2.bias   = ctx.variable(b2, requires_grad = true)
-  result.output.weight = ctx.variable(w3, requires_grad = true)
-  result.output.bias   = ctx.variable(b3, requires_grad = true)
+  let w1 = kaiming_normal(layers[1], layers[0], nl_tanh)
+  let w2 = kaiming_normal(layers[2], layers[1], nl_tanh)
+  let w3 = kaiming_normal(layers[3], layers[2], nl_tanh)
+
+  let b1 = zeros[F]([1, layers[1]])
+  let b2 = zeros[F]([1, layers[2]])
+  let b3 = zeros[F]([1, layers[3]])
+
+  result.nodes1.weight = ctx.variable(w1, requires_grad = true)
+  result.nodes1.bias   = ctx.variable(b1, requires_grad = true)
+  result.nodes2.weight = ctx.variable(w2, requires_grad = true)
+  result.nodes2.bias   = ctx.variable(b2, requires_grad = true)
+  result.nodes3.weight = ctx.variable(w3, requires_grad = true)
+  result.nodes3.bias   = ctx.variable(b3, requires_grad = true)
 
 
 proc forward*(model: PlanarNet; input: Variable[Tensor[F]]): Variable[Tensor[F]] =
-  template hidden1(x: Variable): Variable =
-    x.linear(model.hidden1.weight, model.hidden1.bias)
+  template nodes1(x: Variable): Variable =
+    x.linear(model.nodes1.weight, model.nodes1.bias)
 
-  template hidden2(x: Variable): Variable =
-    x.linear(model.hidden2.weight, model.hidden2.bias)
+  template nodes2(x: Variable): Variable =
+    x.linear(model.nodes2.weight, model.nodes2.bias)
   
-  template output(x: Variable): Variable =
-    x.linear(model.output.weight, model.output.bias)
+  template nodes3(x: Variable): Variable =
+    x.linear(model.nodes3.weight, model.nodes3.bias)
 
-  return input.hidden1.tanh.hidden2.tanh.output
+  return input.nodes1.tanh.nodes2.tanh.nodes3
