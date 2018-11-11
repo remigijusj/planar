@@ -1,7 +1,5 @@
 import arraymancer, random, math, sequtils
 
-randomize()
-
 
 # arraymancer private
 proc randomNormal(mean = 0.0, std = 1.0): float =
@@ -21,7 +19,7 @@ proc randomNormal(mean = 0.0, std = 1.0): float =
 proc makePlanar(m: int, makedot: proc(i, j, k: int): (float, float) {.closure.}): auto =
   var xs = zeros[float]([m, 2])
   var ys = zeros[float]([m, 1])
-  let k = int(m/2)
+  let k = m div 2
 
   for j in 0..1:
     for i in 0..<k:
@@ -59,10 +57,10 @@ proc makeMoons*(m: int, blur=0.15): auto =
   makePlanar(m) do (i, j, k: int) -> (float, float):
     theta = PI * i.float / k.float
     if j==0:
-      return (-0.5  + cos(theta) + blur * randomNormal(),
+      return (-0.50 + cos(theta) + blur * randomNormal(),
               -0.25 + sin(theta) + blur * randomNormal())
     if j==1:
-      return ( 0.5  - cos(theta) + blur * randomNormal(),
+      return ( 0.50 - cos(theta) + blur * randomNormal(),
                0.25 - sin(theta) + blur * randomNormal())
 
 
