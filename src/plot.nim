@@ -31,19 +31,12 @@ proc showScatter*(xs, ys: Tensor[float], title="Plot", plotsize=500, dotsize=8.0
   p.show()
 
 
-# the data needs to be supplied as a nested seq
-proc reshapeData(data: Tensor[float], side: int): seq[seq[float]] =
-  result = newSeqWith(side, newSeq[float](side))
-  for x in 0..<side:
-    for y in 0..<side:
-      let m = x * side + y
-      result[y][x] = data[m, 0]  # <<< opposite?
-
-
-proc showHeatmap*(data: Tensor[float], side: int, title="Plot", plotsize=500): void =
+proc showHeatmap*(data: seq[seq[float]], scale: seq[float], title="Plot", plotsize=500): void =
   let d = Trace[float](mode: PlotMode.Lines, `type`: PlotType.HeatMap)
 
-  d.zs = reshapeData(data, side)
+  d.zs = data
+  d.xs = scale
+  d.ys = scale
   d.colormap = ColorMap.Bluered
 
   let layout = Layout(
@@ -58,13 +51,14 @@ proc showHeatmap*(data: Tensor[float], side: int, title="Plot", plotsize=500): v
   p.show()
 
 
-proc showContour*(data: Tensor[float], side: int, title="Plot", plotsize=500): void =
+proc showContour*(data: seq[seq[float]], scale: seq[float], title="Plot", plotsize=500): void =
   let d = Trace[float](mode: PlotMode.Lines, `type`: PlotType.Contour)
 
-  d.zs = reshapeData(data, side)
+  d.zs = data
+  d.xs = scale
+  d.ys = scale
   d.colorscale = ColorMap.Bluered
   d.heatmap = true
-  d.autocontour = false
   d.contours = (0.0, 1.0, 0.5)
 
   let layout = Layout(
@@ -92,5 +86,5 @@ proc showLines*(data: seq[float], title="Plot"): void =
       yaxis: Axis(title: "y-axis"),
       autosize: false)
 
-  let p = Plot[float64](layout: layout, traces: @[d])
+  let p = Plot[float](layout: layout, traces: @[d])
   p.show()

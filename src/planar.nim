@@ -1,6 +1,3 @@
-import ./datasets
-import ./plot
-import ./network
-import ./options
+import datasets, grid, plot, network, options
 
-export datasets, plot, network, options
+export datasets, grid, plot, network, options

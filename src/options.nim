@@ -19,7 +19,7 @@ var
   examples* = 500
   epochs* = 100
   debug_every* = 10
-  grid_size* = 40
+  grid_step* = 0.2
   show* = false
   hyper* = defaultHyper()
 
@@ -30,7 +30,7 @@ proc parseOptions*(): auto =
     of cmdLongOption, cmdShortOption:
       case key
       of "plot", "show", "p", "s": show = true
-      of "grid", "gs":       grid_size = parseInt(val.string)
+      of "grid", "gs":       grid_step = parseFloat(val.string)
       of "examples", "x":    examples = parseInt(val.string)
       of "epochs", "e":      epochs = parseInt(val.string)
       of "batch_size", "bs": hyper.batch_size = parseInt(val.string)

@@ -1,4 +1,4 @@
-import arraymancer, random, math, sequtils
+import arraymancer, random, math
 
 
 # arraymancer private
@@ -71,15 +71,3 @@ proc makeCircles*(m: int, inner = 0.7, outer = 1.0, blur=0.1): auto =
     radius = if j==0: inner else: outer
     return (radius * cos(theta) + blur * randomNormal(),
             radius * sin(theta) + blur * randomNormal())
-
-
-proc planarGrid*(xs: Tensor[float], side: int): auto =
-  result = zeros[float]([side * side, 2])
-  let lim = xs.data().mapIt(it.abs).max() + 0.1 # NOTE: xs.map.reduce didnt' work
-
-  for x in 0..<side:
-    for y in 0..<side:
-      let m = x * side + y
-      result[m, 0] = (2 * x.float / side.float - 1.0) * lim
-      result[m, 1] = (2 * y.float / side.float - 1.0) * lim
-
