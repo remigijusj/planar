@@ -29,12 +29,12 @@ proc parseOptions*(): auto =
     case kind
     of cmdLongOption, cmdShortOption:
       case key
-      of "plot", "show", "p", "s": show = true
+      of "show", "s":        show = true
       of "grid", "gs":       grid_step = parseFloat(val.string)
       of "examples", "x":    examples = parseInt(val.string)
       of "epochs", "e":      epochs = parseInt(val.string)
       of "batch_size", "bs": hyper.batch_size = parseInt(val.string)
-      of "rate", "r", "lr":  hyper.learning_rate = parseFloat(val.string)
+      of "rate", "lr":       hyper.learning_rate = parseFloat(val.string)
       of "beta1", "b1":      hyper.beta1 = parseFloat(val.string)
       of "beta2", "b2":      hyper.beta2 = parseFloat(val.string)
       else: discard
