@@ -1,3 +1,3 @@
-import datasets, grid, plot, network, options
+import options, datasets, grid, plot, training
 
-export datasets, grid, plot, network, options
+export options, datasets, grid, plot, training

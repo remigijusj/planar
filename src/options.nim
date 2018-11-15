@@ -17,6 +17,9 @@ proc defaultHyper(): auto =
     beta2: 0.99
   )
 
+const
+  depth* = 2 # >= 1
+
 var
   examples* = 500
   epochs* = 100
@@ -27,7 +30,8 @@ var
 
 
 proc parseIntsList(val: string): seq[int] =
-  val.split(',').mapIt(it.parseInt)
+  result = val.split(',').mapIt(it.parseInt)
+  assert(result.len == depth)
 
 
 proc parseOptions*(): auto =
