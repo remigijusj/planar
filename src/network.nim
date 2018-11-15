@@ -1,22 +1,19 @@
-import arraymancer, strformat, random
+import arraymancer, strformat, sequtils, random
 import ./options
 
 type F = float32 # internal datatype for efficiency
-
-# TODO: move hidden sizes to hyperparams
-const layers = [2, 5, 5, 1]
 
 let ctx = newContext(Tensor[F])
 
 network ctx, PlanarNet:
   layers:
-    hidden1: Linear(layers[0], layers[1])
-    hidden2: Linear(layers[1], layers[2])
-    outputs: Linear(layers[2], layers[3])
+    hidden0: Linear(2, hyper.layers[0])
+    hidden1: Linear(hyper.layers[0], hyper.layers[1])
+    outputs: Linear(hyper.layers[1], 1)
   initialize:
     Xavier(uniform, tanh)
   forward x:
-    x.hidden1.tanh.hidden2.tanh.outputs
+    x.hidden0.tanh.hidden1.tanh.outputs
 
 
 proc predict*(model: PlanarNet, x_test: Tensor[float]): Tensor[float] =

@@ -1,7 +1,8 @@
-import parseopt, strutils
+import parseopt, sequtils, strutils
 
 type
   Hyperparams* = ref object
+    layers*: seq[int]
     batch_size*: int
     learning_rate*: float
     beta1*: float
@@ -9,6 +10,7 @@ type
 
 proc defaultHyper(): auto =
   Hyperparams(
+    layers: @[5, 5],
     batch_size: 32,
     learning_rate: 1.0,
     beta1: 0.9,
@@ -24,6 +26,10 @@ var
   hyper* = defaultHyper()
 
 
+proc parseIntsList(val: string): seq[int] =
+  val.split(',').mapIt(it.parseInt)
+
+
 proc parseOptions*(): auto =
   for kind, key, val in getopt():
     case kind
@@ -33,6 +39,7 @@ proc parseOptions*(): auto =
       of "grid", "gs":       grid_step = parseFloat(val.string)
       of "examples", "x":    examples = parseInt(val.string)
       of "epochs", "e":      epochs = parseInt(val.string)
+      of "layers", "l":      hyper.layers = parseIntsList(val.string)
       of "batch_size", "bs": hyper.batch_size = parseInt(val.string)
       of "rate", "lr":       hyper.learning_rate = parseFloat(val.string)
       of "beta1", "b1":      hyper.beta1 = parseFloat(val.string)
