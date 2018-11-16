@@ -10,7 +10,7 @@ type
 
 proc defaultHyper(): auto =
   Hyperparams(
-    layers: @[5, 5],
+    layers: @[5, 3, 1],
     batch_size: 32,
     learning_rate: 1.0,
     beta1: 0.9,
@@ -19,6 +19,7 @@ proc defaultHyper(): auto =
 
 const
   depth* = 2 # >= 1
+  activation* = "tanh" # tanh, relu, sigmoid
 
 var
   examples* = 500
@@ -31,7 +32,8 @@ var
 
 proc parseIntsList(val: string): seq[int] =
   result = val.split(',').mapIt(it.parseInt)
-  assert(result.len == depth)
+  result.add(1)
+  assert(result.len == depth + 1)
 
 
 proc parseOptions*(): auto =

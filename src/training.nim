@@ -5,7 +5,7 @@ type F = float32 # internal datatype for efficiency
 
 let ctx = newContext(Tensor[F])
 
-buildPlanarNet(depth, tanh)
+buildPlanarNet(depth, activation)
 
 
 proc predict*(model: PlanarNet, x_test: Tensor[float]): Tensor[float] =
