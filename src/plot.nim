@@ -6,7 +6,8 @@ const
   white = Color(r: 0.9, g: 0.9, b: 0.9, a: 1.0)
   black = Color(r: 0.0, g: 0.0, b: 0.0, a: 1.0)
 
-proc showScatter*(xs, ys: Tensor[float], title="Plot", plotsize=500, dotsize=8.0): void =
+
+proc plotScatter*(xs, ys: Tensor[float], title="Plot", plotsize=500, dotsize=8.0): Plot[float] =
   let d = Trace[float](mode: PlotMode.Markers, `type`: PlotType.Scatter)
   let m = ys.shape[0]
 
@@ -28,11 +29,10 @@ proc showScatter*(xs, ys: Tensor[float], title="Plot", plotsize=500, dotsize=8.0
     yaxis: Axis(title: "y-axis")
   )
 
-  let p = Plot[float](layout: layout, traces: @[d])
-  p.show()
+  Plot[float](layout: layout, traces: @[d])
 
 
-proc showHeatmap*(data: seq[seq[float]], scale: seq[float], title="Plot", plotsize=500): void =
+proc plotHeatmap*(data: seq[seq[float]], scale: seq[float], title="Plot", plotsize=500): Plot[float] =
   let d = Trace[float](mode: PlotMode.Lines, `type`: PlotType.HeatMap)
 
   d.zs = data
@@ -48,11 +48,10 @@ proc showHeatmap*(data: seq[seq[float]], scale: seq[float], title="Plot", plotsi
     yaxis: Axis(title: "y-axis"),
     autosize: true)
 
-  let p = Plot[float](layout: layout, traces: @[d])
-  p.show()
+  Plot[float](layout: layout, traces: @[d])
 
 
-proc showContour*(data: seq[seq[float]], scale: seq[float], title="Plot", plotsize=500): void =
+proc plotContour*(data: seq[seq[float]], scale: seq[float], title="Plot", plotsize=500): Plot[float] =
   let d = Trace[float](mode: PlotMode.Lines, `type`: PlotType.Contour)
 
   d.zs = data
@@ -70,11 +69,10 @@ proc showContour*(data: seq[seq[float]], scale: seq[float], title="Plot", plotsi
     yaxis: Axis(title: "y-axis"),
     autosize: true)
 
-  let p = Plot[float](layout: layout, traces: @[d])
-  p.show()
+  Plot[float](layout: layout, traces: @[d])
 
 
-proc showLines*(data: seq[float], title="Plot"): void =
+proc plotLines*(data: seq[float], title="Plot"): Plot[float] =
   let d = Trace[float](mode: PlotMode.Lines, `type`: PlotType.Scatter)
 
   d.ys = data
@@ -87,11 +85,10 @@ proc showLines*(data: seq[float], title="Plot"): void =
       yaxis: Axis(title: "y-axis"),
       autosize: false)
 
-  let p = Plot[float](layout: layout, traces: @[d])
-  p.show()
+  Plot[float](layout: layout, traces: @[d])
 
 
-proc showCombined*(xs, ys: Tensor[float], zs: seq[seq[float]], scale: seq[float], ps: seq[float]): void =
+proc plotCombined*(xs, ys: Tensor[float], zs: seq[seq[float]], scale: seq[float], ps: seq[float]): Plot[float] =
   let d1 = Trace[float](mode: PlotMode.Lines, `type`: PlotType.Contour, name: "grid")
   let d2 = Trace[float](mode: PlotMode.Markers, `type`: PlotType.Scatter, name: "dots")
   let d3 = Trace[float](mode: PlotMode.Lines, `type`: PlotType.Scatter, name: "score")
@@ -131,5 +128,11 @@ proc showCombined*(xs, ys: Tensor[float], zs: seq[seq[float]], scale: seq[float]
     xaxis2: Axis(domain: @[0.0, 0.46], anchor: "y2"),
     yaxis2: Axis(domain: @[0.0, 1.0], anchor: "x2", range: (0.0, 1.0)))
 
-  let p = Plot[float](layout: layout, traces: @[d1, d2, d3])
-  p.show()
+  Plot[float](layout: layout, traces: @[d1, d2, d3])
+
+
+proc output*(p: Plot[float], display: bool, file: string): void =
+  if display:
+    p.show(path=file)
+  elif file.len > 0:
+    discard p.save(path=file)

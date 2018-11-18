@@ -10,7 +10,7 @@ type
 
 proc defaultHyper(): auto =
   Hyperparams(
-    layers: @[5, 3, 1],
+    layers: @[5, 5, 2, 1],
     batch_size: 32,
     learning_rate: 1.0,
     beta1: 0.9,
@@ -18,7 +18,7 @@ proc defaultHyper(): auto =
   )
 
 const
-  depth* = 2 # >= 1
+  depth* = 3 # >= 1
   activation* = "tanh" # tanh, relu, sigmoid
 
 var
@@ -26,7 +26,8 @@ var
   epochs* = 100
   debug_every* = 10
   grid_step* = 0.2
-  show* = false
+  file* = ""
+  display* = false
   hyper* = defaultHyper()
 
 
@@ -41,7 +42,8 @@ proc parseOptions*(): auto =
     case kind
     of cmdLongOption, cmdShortOption:
       case key
-      of "show", "s":        show = true
+      of "show", "s":        display = true
+      of "file", "f":        file = val.string
       of "grid", "gs":       grid_step = parseFloat(val.string)
       of "examples", "x":    examples = parseInt(val.string)
       of "epochs", "e":      epochs = parseInt(val.string)

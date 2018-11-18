@@ -11,5 +11,5 @@ let (model, scores) = trainModel(x, y, hyper, epochs, debug_every)
 let (grid, scale) = planarGrid(x.limit, grid_step)
 let pred = model.predict(grid)
 
-if show:
-  showCombined(x, y, pred.asGrid, scale, scores)
+let p = plotCombined(x, y, pred.asGrid, scale, scores)
+output(p, display, file)
