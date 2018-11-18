@@ -6,7 +6,7 @@ randomize()
 
 if help: justShowUsage()
 
-let (x, y) = makePetals(examples)
+let (x, y) = makePattern(examples, pattern)
 
 let (model, scores) = trainModel(x, y, hyper, epochs, debug_every)
 

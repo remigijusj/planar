@@ -28,6 +28,17 @@ proc shuffleExamples[T](x, y: Tensor[T]) =
     swap(yd[i], yd[j])
 
 
+proc debugHeader(debug_every: int) =
+  if debug_every > 0:
+    echo "| epo |  loss |  acc |"
+    echo "+-----+-------+------+"
+
+
+proc debugEpoch(debug_every, epoch: int, loss, score: float) =
+  if debug_every > 0 and (epoch mod debug_every == 0):
+    echo &"| {epoch:3d} | {loss:.3f} | {score:.2f} |"
+
+
 # in the process examples get shuffled, see above
 proc trainModel*(x_train, y_train: Tensor[float],
                  hyper: Hyperparams,
@@ -43,9 +54,7 @@ proc trainModel*(x_train, y_train: Tensor[float],
   let optim = model.optimizerSGD(hyper.learning_rate.F)
   var progress = newSeq[float]()
 
-  if debug_every > 0:
-    echo "| epo |  loss |  acc |"
-    echo "+-----+-------+------+"
+  debugHeader(debug_every)
 
   # mini-batch gradient descent
   for epoch in 0..<epochs_cnt:
@@ -67,7 +76,6 @@ proc trainModel*(x_train, y_train: Tensor[float],
           let y_pred = output.value.sigmoid.round
           let score = accuracy_score(target, y_pred)
           progress.add(score)
-          if debug_every > 0 and (epoch mod debug_every == 0):
-            echo &"| {epoch:3d} | {loss.value[0]:.3f} | {score:.2f} |"
+          debugEpoch(debug_every, epoch, loss.value[0], score)
 
   return (model, progress)

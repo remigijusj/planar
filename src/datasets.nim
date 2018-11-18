@@ -71,3 +71,14 @@ proc makeCircles*(m: int, inner = 0.7, outer = 1.0, blur=0.1): auto =
     radius = if j==0: inner else: outer
     return (radius * cos(theta) + blur * randomNormal(),
             radius * sin(theta) + blur * randomNormal())
+
+
+proc makePattern*(m: int, pattern: string): auto =
+  case pattern:
+  of "petals":  makePetals(m)
+  of "spirals": makeSpirals(m)
+  of "moons":   makeMoons(m)
+  of "circles": makeCircles(m)
+  else:
+    echo "invalid pattern"
+    quit()
