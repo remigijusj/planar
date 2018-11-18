@@ -4,6 +4,8 @@ import ../src/planar
 parseOptions()
 randomize()
 
+if help: justShowUsage()
+
 let (x, y) = makePetals(examples)
 
 let (model, scores) = trainModel(x, y, hyper, epochs, debug_every)
