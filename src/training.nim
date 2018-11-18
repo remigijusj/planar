@@ -43,6 +43,10 @@ proc trainModel*(x_train, y_train: Tensor[float],
   let optim = model.optimizerSGD(hyper.learning_rate.F)
   var progress = newSeq[float]()
 
+  if debug_every > 0:
+    echo "| epo |  loss |  acc |"
+    echo "+-----+-------+------+"
+
   # mini-batch gradient descent
   for epoch in 0..<epochs_cnt:
     shuffleExamples(x.value, y)
@@ -64,6 +68,6 @@ proc trainModel*(x_train, y_train: Tensor[float],
           let score = accuracy_score(target, y_pred)
           progress.add(score)
           if debug_every > 0 and (epoch mod debug_every == 0):
-            echo &"Epoch {epoch:2d} => loss {loss.value[0]:.3f} Score {score:.3f}%"
+            echo &"| {epoch:3d} | {loss.value[0]:.3f} | {score:.2f} |"
 
   return (model, progress)
