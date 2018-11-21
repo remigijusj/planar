@@ -39,6 +39,13 @@ proc debugEpoch(debug_every, epoch: int, loss, score: float) =
     echo &"| {epoch:3d} | {loss:.3f} | {score:.2f} |"
 
 
+proc makeOptimizer(model: PlanarNet, hyper: Hyperparams): Optimizer[Tensor[F]] =
+  if options.optimizer == "adam":
+    result = model.optimizer(Adam, hyper.learning_rate.F, hyper.beta1.F, hyper.beta2.F)
+  else:
+    result = model.optimizer(SGD, hyper.learning_rate.F)
+
+
 # in the process examples get shuffled, see above
 proc trainModel*(x_train, y_train: Tensor[float],
                  hyper: Hyperparams,
@@ -50,8 +57,7 @@ proc trainModel*(x_train, y_train: Tensor[float],
   let max_batch = ceil(examples/hyper.batch_size).int - 1
 
   let model = ctx.init(PlanarNet)
-  # let optim = model.optimizerAdam(hyper.learning_rate.F, hyper.beta1.F, hyper.beta2.F)
-  let optim = model.optimizerSGD(hyper.learning_rate.F)
+  let optim = makeOptimizer(model, hyper)
   var progress = newSeq[float]()
 
   debugHeader(debug_every)
