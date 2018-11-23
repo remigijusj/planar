@@ -11,7 +11,7 @@ type
 
 proc defaultHyper(): auto =
   Hyperparams(
-    layers: @[5, 5, 2, 1],
+    layers: @[5, 2, 1],
     batch_size: 32,
     learning_rate: 1.0,
     beta1: 0.9,
@@ -20,7 +20,7 @@ proc defaultHyper(): auto =
   )
 
 const
-  depth* = 3 # >= 1
+  depth* = 2 # >= 1
   activation* = "tanh" # tanh, relu, sigmoid
 
 var
@@ -54,7 +54,7 @@ Usage: plan [options]
   --optim,    -o   Optimizer (sgd|adam)
   --debug,    -d   Debug info every d epochs (10)
   --grid,    -gs   Grid step (0.2)
-  --layers,  -ls      Hidden layer sizes (5,5,2,1)
+  --layers,  -ls      Hidden layer sizes (5,2,1)
   --batch,   -bs      Batch size (32)
   --rate,    -lr      Learning rate (1.0)
   --beta1,   -b1      Beta1 for Adam (0.9)
