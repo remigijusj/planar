@@ -53,13 +53,13 @@ Usage: plan [options]
   --epochs,   -e   Number of epochs (100)
   --optim,    -o   Optimizer (sgd|adam)
   --debug,    -d   Debug info every d epochs (10)
-  --grid,    -gs   Grid step (0.2)
-  --layers,  -ls      Hidden layer sizes (5,2,1)
-  --batch,   -bs      Batch size (32)
-  --rate,    -lr      Learning rate (1.0)
-  --beta1,   -b1      Beta1 for Adam (0.9)
-  --beta2,   -b2      Beta2 for Adam (0.999)
-  --epsilon           Epsilon for Adam (1e-8)
+  --grid,     -g   Grid step (0.2)
+  --layers,   -l      Hidden layer sizes (5,2,1)
+  --batch,    -b      Batch size (32)
+  --rate,     -r      Learning rate (1.0)
+  --beta1,    -B1     Beta1 for Adam (0.9)
+  --beta2,    -B2     Beta2 for Adam (0.999)
+  --epsilon,  -E      Epsilon for Adam (1e-8)
 """
   quit()
 
@@ -68,20 +68,20 @@ proc parseOptions*(): auto =
     case kind
     of cmdLongOption, cmdShortOption:
       case key
-      of "help", "h":        help = true
-      of "show", "s":        display = true
-      of "file", "f":        file = val.string
+      of "help",     "h":    help = true
+      of "show",     "s":    display = true
+      of "file",     "f":    file = val.string
       of "pattern",  "p":    pattern = val.string
       of "examples", "x":    examples = parseInt(val.string)
       of "epochs",   "e":    epochs = parseInt(val.string)
       of "optim",    "o":    optimizer = val.string
       of "debug",    "d":    debug_every = parseInt(val.string)
-      of "grid",     "gs":   grid_step = parseFloat(val.string)
-      of "layers",   "ls":   hyper.layers = parseIntsList(val.string)
-      of "batch",    "bs":   hyper.batch_size = parseInt(val.string)
-      of "rate",     "lr":   hyper.learning_rate = parseFloat(val.string)
-      of "beta1",    "b1":   hyper.beta1 = parseFloat(val.string)
-      of "beta2",    "b2":   hyper.beta2 = parseFloat(val.string)
-      of "epsilon":          hyper.epsilon = parseFloat(val.string)
+      of "grid",     "g":    grid_step = parseFloat(val.string)
+      of "layers",   "l":    hyper.layers = parseIntsList(val.string)
+      of "batch",    "b":    hyper.batch_size = parseInt(val.string)
+      of "rate",     "r":    hyper.learning_rate = parseFloat(val.string)
+      of "beta1",    "B1":   hyper.beta1 = parseFloat(val.string)
+      of "beta2",    "B2":   hyper.beta2 = parseFloat(val.string)
+      of "epsilon",  "E":    hyper.epsilon = parseFloat(val.string)
       else: discard
     else: discard
