@@ -7,6 +7,7 @@ type
     learning_rate*: float
     beta1*: float
     beta2*: float
+    epsilon*: float
 
 proc defaultHyper(): auto =
   Hyperparams(
@@ -14,7 +15,8 @@ proc defaultHyper(): auto =
     batch_size: 32,
     learning_rate: 1.0,
     beta1: 0.9,
-    beta2: 0.999
+    beta2: 0.999,
+    epsilon: 1e-8
   )
 
 const
@@ -57,6 +59,7 @@ Usage: plan [options]
   --rate,    -lr      Learning rate (1.0)
   --beta1,   -b1      Beta1 for Adam (0.9)
   --beta2,   -b2      Beta2 for Adam (0.999)
+  --epsilon           Epsilon for Adam (1e-8)
 """
   quit()
 
@@ -79,5 +82,6 @@ proc parseOptions*(): auto =
       of "rate",     "lr":   hyper.learning_rate = parseFloat(val.string)
       of "beta1",    "b1":   hyper.beta1 = parseFloat(val.string)
       of "beta2",    "b2":   hyper.beta2 = parseFloat(val.string)
+      of "epsilon":          hyper.epsilon = parseFloat(val.string)
       else: discard
     else: discard
