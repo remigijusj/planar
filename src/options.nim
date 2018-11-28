@@ -50,6 +50,11 @@ proc parseIntsList(val: string): seq[int] =
   assert(result.len == depth + 1)
 
 
+proc parseEnum(val: string, pat: string): string =
+  result = val
+  assert(pat.split("|").contains(val))
+
+
 proc justShowUsage*() =
   echo """
 Usage: plan [options]
@@ -78,27 +83,31 @@ Hyper-params:
 
 proc parseOptions*(): auto =
   for kind, key, val in getopt():
-    case kind
-    of cmdLongOption, cmdShortOption:
-      case key
-      of "help",     "h":     help = true
-      of "show",     "s":     display = true
-      of "file",     "f":     file = val.string
-      #
-      of "pattern",  "p":     pattern = val.string
-      of "examples", "x":     examples = parseInt(val.string)
-      of "epochs",   "e":     epochs = parseInt(val.string)
-      of "optim",    "o":     optimizer = val.string
-      of "debug",    "d":     debug_every = parseInt(val.string)
-      of "grid_step","g":     grid_step = parseFloat(val.string)
-      of "rand_seed","r":     random_seed = parseInt(val.string)
-      #
-      of "layers",      "L":  hyper.layers = parseIntsList(val.string)
-      of "batch_size",  "S":  hyper.batch_size = parseInt(val.string)
-      of "learn_rate",  "R":  hyper.learning_rate = parseFloat(val.string)
-      of "weight_decay","D":  hyper.weight_decay = parseFloat(val.string)
-      of "beta1",       "B1": hyper.beta1 = parseFloat(val.string)
-      of "beta2",       "B2": hyper.beta2 = parseFloat(val.string)
-      of "epsilon",     "E":  hyper.epsilon = parseFloat(val.string)
+    try:
+      case kind
+      of cmdLongOption, cmdShortOption:
+        case key
+        of "help",     "h":     help = true
+        of "show",     "s":     display = true
+        of "file",     "f":     file = val.string
+        #
+        of "pattern",  "p":     pattern = parseEnum(val.string, "petals|spirals|moons|circles")
+        of "examples", "x":     examples = parseInt(val.string)
+        of "epochs",   "e":     epochs = parseInt(val.string)
+        of "optim",    "o":     optimizer = parseEnum(val.string, "sgd|adam")
+        of "debug",    "d":     debug_every = parseInt(val.string)
+        of "grid_step","g":     grid_step = parseFloat(val.string)
+        of "rand_seed","r":     random_seed = parseInt(val.string)
+        #
+        of "layers",      "L":  hyper.layers = parseIntsList(val.string)
+        of "batch_size",  "S":  hyper.batch_size = parseInt(val.string)
+        of "learn_rate",  "R":  hyper.learning_rate = parseFloat(val.string)
+        of "weight_decay","D":  hyper.weight_decay = parseFloat(val.string)
+        of "beta1",       "B1": hyper.beta1 = parseFloat(val.string)
+        of "beta2",       "B2": hyper.beta2 = parseFloat(val.string)
+        of "epsilon",     "E":  hyper.epsilon = parseFloat(val.string)
+        else: discard
       else: discard
-    else: discard
+    except:
+      echo "Invalid option: " & key & " (try --help)"
+      quit()

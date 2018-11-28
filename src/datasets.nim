@@ -80,5 +80,4 @@ proc makePattern*(m: int, pattern: string): auto =
   of "moons":   makeMoons(m)
   of "circles": makeCircles(m)
   else:
-    echo "invalid pattern"
     quit()
