@@ -30,13 +30,13 @@ proc shuffleExamples[T](x, y: Tensor[T]) =
 
 proc debugHeader(debug_every: int) =
   if debug_every > 0:
-    echo "| epo |  loss |  acc |"
-    echo "+-----+-------+------+"
+    echo "| epo |  loss |   err | maxp |"
+    echo "+-----+-------+-------+------+"
 
 
-proc debugEpoch(debug_every, epoch: int, loss, score: float) =
+proc debugEpoch(debug_every, epoch: int, loss, error, max_p: float) =
   if debug_every > 0 and (epoch mod debug_every == 0):
-    echo &"| {epoch:3d} | {loss:.3f} | {score:.2f} |"
+    echo &"| {epoch:3d} | {loss:.3f} | {error:.3f} | {max_p:.2f} |"
 
 
 proc makeOptimizer(model: PlanarNet, hyper: Hyperparams): Optimizer[Tensor[F]] =
@@ -58,7 +58,7 @@ proc trainModel*(x_train, y_train: Tensor[float],
 
   let model = ctx.init(PlanarNet)
   let optim = makeOptimizer(model, hyper)
-  var progress = newSeq[float]()
+  var progress = newSeqOfCap[float](epochs_cnt)
 
   debugHeader(debug_every)
 
@@ -80,8 +80,9 @@ proc trainModel*(x_train, y_train: Tensor[float],
       if batch_id == max_batch:
         ctx.no_grad_mode:
           let y_pred = output.value.sigmoid.round
-          let score = accuracy_score(target, y_pred)
-          progress.add(score)
-          debugEpoch(debug_every, epoch, loss.value[0], score)
+          let error = 1.0 - accuracy_score(target, y_pred)
+          let max_p = optim.params.map(proc(p: Variable[Tensor[F]]): float = p.value.reduce_inline: x = max(x, y.float.abs))
+          progress.add(error)
+          debugEpoch(debug_every, epoch, loss.value[0], error, max_p.max)
 
   return (model, progress)

@@ -2,9 +2,11 @@ import random
 import ../src/planar
 
 parseOptions()
-randomize()
 
 if help: justShowUsage()
+
+echo "Seed: " & $random_seed
+randomize(random_seed)
 
 let (x, y) = makePattern(examples, pattern)
 
