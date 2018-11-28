@@ -41,9 +41,9 @@ proc debugEpoch(debug_every, epoch: int, loss, score: float) =
 
 proc makeOptimizer(model: PlanarNet, hyper: Hyperparams): Optimizer[Tensor[F]] =
   if options.optimizer == "adam":
-    result = model.optimizer(Adam, hyper.learning_rate.F, hyper.beta1.F, hyper.beta2.F, hyper.epsilon.F)
+    result = model.optimizer(Adam, hyper.learning_rate.F, hyper.beta1.F, hyper.beta2.F, hyper.epsilon.F, hyper.weight_decay.F)
   else:
-    result = model.optimizer(SGD, hyper.learning_rate.F)
+    result = model.optimizer(SGD, hyper.learning_rate.F, hyper.weight_decay.F)
 
 
 # in the process examples get shuffled, see above

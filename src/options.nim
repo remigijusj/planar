@@ -5,6 +5,7 @@ type
     layers*: seq[int]
     batch_size*: int
     learning_rate*: float
+    weight_decay*: float
     beta1*: float
     beta2*: float
     epsilon*: float
@@ -14,6 +15,7 @@ proc defaultHyper(): auto =
     layers: @[5, 2, 1],
     batch_size: 32,
     learning_rate: 1.0,
+    weight_decay: 0.0,
     beta1: 0.9,
     beta2: 0.999,
     epsilon: 1e-8
@@ -57,6 +59,7 @@ Usage: plan [options]
   --layers,   -l      Hidden layer sizes (5,2,1)
   --batch,    -b      Batch size (32)
   --rate,     -r      Learning rate (1.0)
+  --wdecay,   -w      Weight decay (0.0)
   --beta1,    -B1     Beta1 for Adam (0.9)
   --beta2,    -B2     Beta2 for Adam (0.999)
   --epsilon,  -E      Epsilon for Adam (1e-8)
@@ -80,6 +83,7 @@ proc parseOptions*(): auto =
       of "layers",   "l":    hyper.layers = parseIntsList(val.string)
       of "batch",    "b":    hyper.batch_size = parseInt(val.string)
       of "rate",     "r":    hyper.learning_rate = parseFloat(val.string)
+      of "wdecay",   "w":    hyper.weight_decay = parseFloat(val.string)
       of "beta1",    "B1":   hyper.beta1 = parseFloat(val.string)
       of "beta2",    "B2":   hyper.beta2 = parseFloat(val.string)
       of "epsilon",  "E":    hyper.epsilon = parseFloat(val.string)
